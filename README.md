@@ -3,9 +3,12 @@
 The algorithm is described in the [the paper: Learning Representation from Skeletal Self-Similarities for Cross-View Action Recognition]. In this work, we propose a view-invariant description by formulating self-similarity images (SSIs) of human skeletons, and accordingly introduce a Multi-Stream Neural Network to learn invariant representations from SSIs of varying scales. 
 
 ## SSIs and the approach overview 
-<img align="center" height="400"  src="docs/teaser1.png">
-
-<img align="center" height="400"  src="docs/teaser2.png">
+<p align="center">
+  <img height="300" src="docs/teaser1.png">
+</p>
+<p align="center">
+  <img height="300" src="docs/teaser2.png">
+</p>
 
 ## Environment and installation
 This repository is developed under **CUDA10.0** and **keras** in **python2.7**. The required python packages can be installed by:

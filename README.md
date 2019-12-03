@@ -24,7 +24,6 @@ pip install -r requirements.txt
 
 `ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset.  
 `ntu-earlyfusion-spp-metric.py`: MSNN <sub>early</sub> model (early fusion model)for the NTU RGB+D dataset. 
-
 `ntu-earlyfusion-spp-metric-c3d.py`: MSNN <sub>early</sub>-C3D model (early fusion model). 
 
 - Notes: In MSNN <sub>early</sub>-C3D model, we use the existing pretrained C3D networks as 3D CNN branches instead of our own designed light-weight CNNs.

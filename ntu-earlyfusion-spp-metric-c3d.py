@@ -1,5 +1,5 @@
 '''implement the ST-LSTM on NTU RGB+D dataset '''
-## python -m pdb c3d-lstm-ntu-middlefusion-v2-ta-metric.py
+## python -m pdb c3d-lstm-ntu-earlyfusion-v2-ta-metric.py
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -829,7 +829,7 @@ if __name__=='__main__':
     
     model = Model(inputs=[main_input1,main_input2,main_input3], outputs=[main_output])
     model.summary()
-    # model.load_weights('full_middlefusion_model_ta.h5')
+    # model.load_weights('full_earlyfusion_model_ta.h5')
     # visualize_layer(model_scale3, 'max_pooling3d_9', x_train3[11:12], 24) # isualize_layer(model, layer_name, data, time_step)
     adam_sgd = op.Adam(amsgrad=True)
     sgd = op.SGD(lr = 0.00001,momentum = 0.9)
@@ -849,7 +849,7 @@ if __name__=='__main__':
     mgpu_model.compile(loss='categorical_crossentropy', optimizer = adam_sgd, metrics=['accuracy'])
     mgpu_model.summary()
     history1 = mgpu_model.fit([x_train1,x_train2,x_train3],y_train1, batch_size = batch_size, epochs=epochs[0]) #epochs=epochs[0] for adam
-    model.save('full_middlefusion_model_ta.h5')
+    model.save('full_earlyfusion_model_ta.h5')
 
     print('jointly second fine-tune the whole fusion network with sgd')
     start_time = time.time()
@@ -858,16 +858,16 @@ if __name__=='__main__':
     mgpu_model = keras.utils.multi_gpu_model(model,gpus=2)
     mgpu_model.compile(loss='categorical_crossentropy', optimizer = sgd,metrics=['accuracy'])
     mgpu_model.summary()
-    model.load_weights('full_middlefusion_model_ta.h5') #60 adam_sgd
+    model.load_weights('full_earlyfusion_model_ta.h5') #60 adam_sgd
     lr_reducer = LrReducer()
     tensorboard = TensorBoard()
-    model_filepath="middle_model_{epoch:02d}-{val_acc:.2f}.h5"
+    model_filepath="early_model_{epoch:02d}-{val_acc:.2f}.h5"
     checkpoint = ModelCheckpoint('/home/data/logs/'+ model_filepath, monitor = 'val_acc', save_weights_only=True)
     history2 = mgpu_model.fit([x_train1,x_train2,x_train3],y_train1, batch_size = batch_size, epochs=epochs[1],validation_split = 0.2, callbacks=[lr_reducer,tensorboard,checkpoint]) #epochs=epochs[1] for sgd
  
     average_time_per_epoch = (time.time() - start_time) / epochs[1]
     print('Training duration (s) : ', time.time() - global_start_time)
-    model.save('full_middle_c3dmodel_final_cv.h5')
+    model.save('full_early_c3dmodel_final_cv.h5')
     # sub_model1 = model.layers[3]
     # sub_model2 = model.layers[4]
     # sub_model3 = model.layers[5]

@@ -4,6 +4,7 @@ The algorithm is described in the [the paper: Learning Representation from Skele
 
 ## SSIs and the approach overview 
 <img align="center" height="400"  src="docs/teaser1.png">
+
 <img align="center" height="400"  src="docs/teaser2.png">
 
 ## Environment and installation

@@ -12,8 +12,6 @@ This repository is developed under **CUDA10.0** and **keras** in **python2.7**. 
 pip install keras
 pip install -r requirements.txt
 ```
-results
-```
 
 ## Running the code
 - Change the code "filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'" in following files for experiments to your own path of the data. 

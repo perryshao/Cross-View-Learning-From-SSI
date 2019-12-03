@@ -34,18 +34,8 @@ class MetricLayer(Layer):
         # x = K.stack(y1,axis=1)
 
         ## 3x3 weight matrix
-        # x = K.sqrt(K.sum(K.square(K.dot(input, self.kernel)), axis =-1, keepdims = True)+K.epsilon()*K.epsilon())
-        # x = (x - K.min(x,axis=2,keepdims=True))/(K.max(x,axis=2,keepdims=True) - K.min(x,axis=2,keepdims=True)+K.epsilon())
-        
-        # x_var = K.var(x, axis=2, keepdims=True)
-        # x = (x-K.repeat_elements(K.mean(x,axis=2,keepdims=True),x.shape[-2],axis=2))/K.repeat_elements(K.sqrt(x_var+K.epsilon()),x.shape[-2],axis=2)
-        # x = K.sigmoid(x)
-
-        ## 3x3 weight matrix
         x = K.sum(K.square(K.dot(input, self.kernel)), axis =-1, keepdims = True)
         x_st = K.reshape(x,[-1,x.shape[1]*x.shape[2],x.shape[-1]])
-        # x_st_max = K.reshape(K.repeat_elements(K.max(x_st,axis=-2,keepdims=True),x.shape[1]*x.shape[2], axis = -2),[-1,x.shape[1],x.shape[2],x.shape[-1]])
-        # x_st_min = K.reshape(K.repeat_elements(K.min(x_st,axis=-2,keepdims=True),x.shape[1]*x.shape[2], axis = -2),[-1,x.shape[1],x.shape[2],x.shape[-1]])  
         x_st_max = K.reshape(K.max(x_st,axis=-2,keepdims=True),[-1,1,1,x.shape[-1]])
         x_st_min = K.reshape(K.min(x_st,axis=-2,keepdims=True),[-1,1,1,x.shape[-1]])
         x = (x - x_st_min)/(x_st_max - x_st_min+K.epsilon())

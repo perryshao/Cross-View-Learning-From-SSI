@@ -311,7 +311,6 @@ def get_model(layers_num,joint_num, max_len, stride_set,class_num, R3,spp_number
     ########define the model###########
     ssm_input = keras.layers.subtract([repeat_input1,repeat_input2])
     ssm_input = MetricLayer(joint_num,kernel_regularizer = regularizers.Maha_R(lamda4))(ssm_input)
-    # ssm_input = Lambda(compute_ssm,compute_ssm_output_shape)(ssm_input)
     ssm_input = Lambda(flattenSSM,flattenSSM_output_shape)(ssm_input)
     c3d_out1 = Conv3D(main_layers[1],kernel_size=[3,3,3],strides = stride_set,activation = 'relu', kernel_regularizer=R3, bias_regularizer=R3,activity_regularizer=R3)(ssm_input)
     # c3d_out1 = MaxPooling3D(pool_size=(1, 2, 2),strides = (1,2,2))(c3d_out1)

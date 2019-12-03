@@ -11,7 +11,7 @@ The algorithm is described in the [the paper: Learning Representation from Skele
 </p>
 
 ## Environment and installation
-This repository is developed under **CUDA10.0** and **keras** in **python2.7**. The required python packages can be installed by:
+This repository is developed under **CUDA10.1** and **keras** in **python2.7**. The required python packages can be installed by:
 ```bash
 pip install keras
 pip install -r requirements.txt

@@ -23,8 +23,11 @@ NTU RGB+D Action Dataset
 - Store the training files **.mat** in your own path.
 
 UESTC RGB-D Varying-view Action Dataset
+
 To do...
+
 Northwestern-UCLA Multiview Action Dataset
+
 To do...
 
 ## Running the code

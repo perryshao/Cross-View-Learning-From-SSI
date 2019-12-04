@@ -22,10 +22,10 @@ pip install -r requirements.txt
 - Store the training files **.mat** in your own path.
 
 ## Running the code
-- Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training data in **Data processing**. 
+Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training data in **Data preprocessing**. 
 
-`ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset. 
-`ntu-earlyfusion-spp-metric.py`: MSNN <sub>early</sub> model (early fusion model)for NTU RGB+D dataset. 
-`ntu-earlyfusion-spp-metric-c3d.py`: MSNN <sub>early</sub>-C3D model (early fusion model). 
+- `ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset. 
+- `ntu-earlyfusion-spp-metric.py`: MSNN <sub>early</sub> model (early fusion model)for NTU RGB+D dataset. 
+- `ntu-earlyfusion-spp-metric-c3d.py`: MSNN <sub>early</sub>-C3D model (early fusion model). 
 
-- Notes: In MSNN <sub>early</sub>-C3D model, we use the existing pretrained C3D networks as 3D CNN branches instead of our own designed light-weight CNNs.
+Notes: In MSNN <sub>early</sub>-C3D model, we use the existing pretrained C3D networks as 3D CNN branches instead of our own designed light-weight CNNs.

@@ -17,9 +17,15 @@ pip install keras
 pip install -r requirements.txt
 ```
 ## Data preprocessing
+### NTU RGB+D Action Dataset
 - Download the skeleton data of the [NTU RGB+D](https://github.com/shahroudy/NTURGB-D) dataset
-- Use the Matlab files provided in `preprocessing/` to read the skeleton data and organize the training data with cross-view and cross-subject protocols. The training data are with **.mat** files.
+- Use the Matlab files provided in `preprocessing/NTU/Matlab` to read the skeleton data and organize the training data with cross-view and cross-subject protocols. The training data are with **.mat** files.
 - Store the training files **.mat** in your own path.
+
+### UESTC RGB-D Varying-view Action Dataset
+To do...
+### Northwestern-UCLA Multiview Action Dataset
+To do...
 
 ## Running the code
 Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training data in **Data preprocessing**. 

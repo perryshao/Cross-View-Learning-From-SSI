@@ -18,10 +18,11 @@ pip install -r requirements.txt
 ```
 ## Data preprocessing
 - Download the skeleton data of the [NTU RGB+D](https://github.com/shahroudy/NTURGB-D) dataset
-- Use the Matlab files provided in `preprocessing/` to read the skeleton data and organize the training data with cross-view and cross-subject protocols.
+- Use the Matlab files provided in `preprocessing/` to read the skeleton data and organize the training data with cross-view and cross-subject protocols. The training data are with **.mat** files.
+- Store the training files **.mat** in your own path.
 
 ## Running the code
-- Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the data. 
+- Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training data in **Data processing**. 
 
 `ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset. 
 `ntu-earlyfusion-spp-metric.py`: MSNN <sub>early</sub> model (early fusion model)for NTU RGB+D dataset. 

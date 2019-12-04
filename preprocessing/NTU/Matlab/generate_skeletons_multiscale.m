@@ -1,4 +1,4 @@
-function read_skeletons_multiscale()
+function read_skeletons_multiscale(Data_Path)
 %  file names of NTU-RGB dataset
 %  S017C003P020R002A033  S: setup No. C: camera No. P: subject No. A: action
 train_n_cv = 37646;test_n_cv = 18932;
@@ -27,13 +27,10 @@ bodyJoints{2} = [HEAD_1 C7_1 T10_1 STRN_1 RELB_1 RFIN_1 LELB_1 LFIN_1 RKNE_1 RTO
 bodyJoints{3} = [HEAD_1 HEAD_A C7_1 T10_1 STRN_1 RSHO_1 RELB_1 RWRA_1 RFIN_A RFIN_B RFIN_1 LSHO_1 LELB_1 LWRA_1 LFIN_A LFIN_B LFIN_1 RFWT_1 RKNE_1 RANK_1  RTOE_1 LFWT_1 LKNE_1 LANK_1  LTOE_1];
 body_num =2;
 FullJointNum = 25;
-data_folder = '/home/data/nturgbd_skeletons/ntu_data_mat/'; %for save
-data_path = '/home/data/nturgbd_skeletons/ntu_data_mat/'; %for loading
-% data_path = '/home/perry/ntu-works/NTURGB-D-master/Matlab/';%for loading
 %% read the skeletons at 1st scale
 scale = 1;
 JOINT_NUM = length(bodyJoints{scale});
-load ([data_path 'test_data_cv.mat'])
+load ([Data_Path 'test_data_cv.mat'])
 for n = 1:test_n_cv
     fprintf ('Loading %d-th skeleton data for test_data_cv at %d scale...\n',n,scale);
     framecount = size(test_data_cv{n,1},1);   
@@ -51,10 +48,10 @@ end
 clear test_data_cv;
 test_data_cv = test_data_cv_scale1;
 clear test_data_cv_scale1;
-eval(['save ' data_folder 'test_data_cv_scale1' ' test_data_cv' ' -v7.3;']);
+eval(['save ' Data_Path 'test_data_cv_scale1' ' test_data_cv' ' -v7.3;']);
 clear test_data_cv;
 
-load ([data_path 'train_data_cv.mat'])
+load ([Data_Path 'train_data_cv.mat'])
 for n = 1:train_n_cv
     fprintf ('Loading %d-th skeleton data for train_data_cv at %d scale...\n',n,scale);
     framecount = size(train_data_cv{n,1},1);    
@@ -72,10 +69,10 @@ end
 clear train_data_cv;
 train_data_cv = train_data_cv_scale1;
 clear train_data_cv_scale1;
-eval(['save ' data_folder 'train_data_cv_scale1' ' train_data_cv' ' -v7.3;']);
+eval(['save ' Data_Path 'train_data_cv_scale1' ' train_data_cv' ' -v7.3;']);
 clear train_data_cv;
 
-load ([data_path 'test_data_cs.mat'])
+load ([Data_Path 'test_data_cs.mat'])
 for n = 1:test_n_cs
     fprintf ('Loading %d-th skeleton data for test_data_cs at %d scale...\n',n,scale);
     framecount = size(test_data_cs{n,1},1);    
@@ -93,10 +90,10 @@ end
 clear test_data_cs;
 test_data_cs = test_data_cs_scale1;
 clear test_data_cs_scale1;
-eval(['save ' data_folder 'test_data_cs_scale1' ' test_data_cs' ' -v7.3;']);
+eval(['save ' Data_Path 'test_data_cs_scale1' ' test_data_cs' ' -v7.3;']);
 clear test_data_cs;
 
-load ([data_path 'train_data_cs.mat'])
+load ([Data_Path 'train_data_cs.mat'])
 for n = 1:train_n_cs
     fprintf ('Loading %d-th skeleton data for train_n_cs at %d scale...\n',n,scale);
     framecount = size(train_data_cs{n,1},1);    
@@ -114,13 +111,13 @@ end
 clear train_data_cs;
 train_data_cs = train_data_cs_scale1;
 clear train_data_cs_scale1;
-eval(['save ' data_folder 'train_data_cs_scale1' ' train_data_cs' ' -v7.3;']);
+eval(['save ' Data_Path 'train_data_cs_scale1' ' train_data_cs' ' -v7.3;']);
 clear train_data_cs;
 
 %% read the skeletons at 2nd scale
 scale = 2;
 JOINT_NUM = length(bodyJoints{scale});
-load ([data_path 'test_data_cv.mat'])
+load ([Data_Path 'test_data_cv.mat'])
 for n = 1:test_n_cv
     fprintf ('Loading %d-th skeleton data for test_data_cv at %d scale...\n',n,scale);
     framecount = size(test_data_cv{n,1},1);   
@@ -138,10 +135,10 @@ end
 clear test_data_cv;
 test_data_cv = test_data_cv_scale2;
 clear test_data_cv_scale2;
-eval(['save ' data_folder 'test_data_cv_scale2' ' test_data_cv' ' -v7.3;']);
+eval(['save ' Data_Path 'test_data_cv_scale2' ' test_data_cv' ' -v7.3;']);
 clear test_data_cv;
 
-load ([data_path 'train_data_cv.mat'])
+load ([Data_Path 'train_data_cv.mat'])
 for n = 1:train_n_cv
     fprintf ('Loading %d-th skeleton data for train_data_cv at %d scale...\n',n,scale);
     framecount = size(train_data_cv{n,1},1);    
@@ -159,10 +156,10 @@ end
 clear train_data_cv;
 train_data_cv = train_data_cv_scale2;
 clear train_data_cv_scale2;
-eval(['save ' data_folder 'train_data_cv_scale2' ' train_data_cv' ' -v7.3;']);
+eval(['save ' Data_Path 'train_data_cv_scale2' ' train_data_cv' ' -v7.3;']);
 clear train_data_cv;
 
-load ([data_path 'test_data_cs.mat'])
+load ([Data_Path 'test_data_cs.mat'])
 for n = 1:test_n_cs
     fprintf ('Loading %d-th skeleton data for test_data_cs at %d scale...\n',n,scale);
     framecount = size(test_data_cs{n,1},1);    
@@ -180,10 +177,10 @@ end
 clear test_data_cs;
 test_data_cs = test_data_cs_scale2;
 clear test_data_cs_scale2;
-eval(['save ' data_folder 'test_data_cs_scale2' ' test_data_cs' ' -v7.3;']);
+eval(['save ' Data_Path 'test_data_cs_scale2' ' test_data_cs' ' -v7.3;']);
 clear test_data_cs;
 
-load ([data_path 'train_data_cs.mat'])
+load ([Data_Path 'train_data_cs.mat'])
 for n = 1:train_n_cs
     fprintf ('Loading %d-th skeleton data for train_n_cs at %d scale...\n',n,scale);
     framecount = size(train_data_cs{n,1},1);    
@@ -201,12 +198,12 @@ end
 clear train_data_cs;
 train_data_cs = train_data_cs_scale2;
 clear train_data_cs_scale2;
-eval(['save ' data_folder 'train_data_cs_scale2' ' train_data_cs' ' -v7.3;']);
+eval(['save ' Data_Path 'train_data_cs_scale2' ' train_data_cs' ' -v7.3;']);
 clear train_data_cs;
 %% read the skeletons at 3rd scale
 scale = 3;
 JOINT_NUM = length(bodyJoints{scale});
-load ([data_path 'test_data_cv.mat'])
+load ([Data_Path 'test_data_cv.mat'])
 for n = 1:test_n_cv
     fprintf ('Loading %d-th skeleton data for test_data_cv at %d scale...\n',n,scale);
     framecount = size(test_data_cv{n,1},1);   
@@ -224,10 +221,10 @@ end
 clear test_data_cv;
 test_data_cv = test_data_cv_scale3;
 clear test_data_cv_scale3;
-eval(['save ' data_folder 'test_data_cv_scale3' ' test_data_cv' ' -v7.3;']);
+eval(['save ' Data_Path 'test_data_cv_scale3' ' test_data_cv' ' -v7.3;']);
 clear test_data_cv;
 
-load ([data_path 'train_data_cv.mat'])
+load ([Data_Path 'train_data_cv.mat'])
 for n = 1:train_n_cv
     fprintf ('Loading %d-th skeleton data for train_data_cv at %d scale...\n',n,scale);
     framecount = size(train_data_cv{n,1},1);    
@@ -245,10 +242,10 @@ end
 clear train_data_cv;
 train_data_cv = train_data_cv_scale3;
 clear train_data_cv_scale3;
-eval(['save ' data_folder 'train_data_cv_scale3' ' train_data_cv' ' -v7.3;']);
+eval(['save ' Data_Path 'train_data_cv_scale3' ' train_data_cv' ' -v7.3;']);
 clear train_data_cv;
 
-load ([data_path 'test_data_cs.mat'])
+load ([Data_Path 'test_data_cs.mat'])
 for n = 1:test_n_cs
     fprintf ('Loading %d-th skeleton data for test_data_cs at %d scale...\n',n,scale);
     framecount = size(test_data_cs{n,1},1);    
@@ -266,10 +263,10 @@ end
 clear test_data_cs;
 test_data_cs = test_data_cs_scale3;
 clear test_data_cs_scale3;
-eval(['save ' data_folder 'test_data_cs_scale3' ' test_data_cs' ' -v7.3;']);
+eval(['save ' Data_Path 'test_data_cs_scale3' ' test_data_cs' ' -v7.3;']);
 clear test_data_cs;
 
-load ([data_path 'train_data_cs.mat'])
+load ([Data_Path 'train_data_cs.mat'])
 for n = 1:train_n_cs
     fprintf ('Loading %d-th skeleton data for train_n_cs at %d scale...\n',n,scale);
     framecount = size(train_data_cs{n,1},1);    
@@ -287,6 +284,6 @@ end
 clear train_data_cs;
 train_data_cs = train_data_cs_scale3;
 clear train_data_cs_scale3;
-eval(['save ' data_folder 'train_data_cs_scale3' ' train_data_cs' ' -v7.3;']);
+eval(['save ' Data_Path 'train_data_cs_scale3' ' train_data_cs' ' -v7.3;']);
 clear train_data_cs;
 

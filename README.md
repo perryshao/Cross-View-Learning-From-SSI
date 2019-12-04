@@ -20,7 +20,14 @@ pip install -r requirements.txt
 
 ### NTU RGB+D Action Dataset
 - Download the skeleton data of the [NTU RGB+D](https://github.com/shahroudy/NTURGB-D) dataset
-- Use the Matlab files provided in `preprocessing/NTU/Matlab` to read the skeleton data and organize the training data with cross-view and cross-subject protocols. The training data are with **.mat** files.
+- Use the Matlab codes provided in `preprocessing/NTU/Matlab` to read the skeleton data and organize the training data with cross-view and cross-subject protocols. The training data are with **.mat** files. Some of the Matlab codes were made by referring to codes in the repository of the [NTU RGB+D](https://github.com/shahroudy/NTURGB-D).
+- Running Matlab codes 
+```bash
+read_skeletons_mat(Dataset_Folder)  
+read_skeletons_multiscale(Data_Path)
+```
+`Dataset_Folder` is the downloaded raw skeleton data (**.skeleton** files).
+`Data_Path` is the path of the raw training and testing data (**.mat** files)., which are generated from the raw skeleton data.
 - Store the training files **.mat** in your own path.
 
 ### UESTC RGB-D Varying-view Action Dataset

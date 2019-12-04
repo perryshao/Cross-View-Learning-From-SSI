@@ -1,6 +1,6 @@
-function read_skeletons_1()
-DATA_FOLDER = '/home/data/nturgbd_skeletons/nturgb+d_skeletons'; % for ubuntu
-%DATA_FOLDER = 'C:\Users\perry\Downloads\nturgbd_skeletons\nturgb+d_skeletons'; % for windows
+function read_skeletons_mat(Dataset_Folder)
+% Data_Folder = '/home/data/nturgbd_skeletons/nturgb+d_skeletons'; % for ubuntu
+Data_Folder = Dataset_Folder
 missing_samples = 'samples_with_missing_skeletons.txt';
 %  file names of NTU-RGB dataset
 %  S017C003P020R002A033  S: setup No. C: camera No. P: subject No. A: action
@@ -12,8 +12,8 @@ train_camera = [2,3];test_camera = 1;
 train_subjects = [1,2,4,5,8,9,13:19,25,27,28,31,34,35,38];
 test_subjects =  [3,6,7,10,11,12,20:24,26,29,30,32,33,36,37,39:40];
 JOINT_NUM = 25;
-DATA_FOLDER = [DATA_FOLDER '/'];
-folder_content = dir([DATA_FOLDER,'*','.skeleton']);
+Data_Folder = [Data_Folder '/'];
+folder_content = dir([Data_Folder,'*','.skeleton']);
 sequences = size(folder_content,1);
 frame_length = zeros(sequences,1);
 
@@ -28,7 +28,7 @@ missing_flag = 0;
 
 count1 = 1; count2 = 1; count3 = 1; count4 = 1;
 for n = 1:sequences
-    string= [DATA_FOLDER,folder_content(n,1).name];
+    string= [Data_Folder,folder_content(n,1).name];
     file_name = folder_content(n,1).name;
 	for i = 1:missing_samples_num
 		if file_name(1:end-9) == missing_file{i}

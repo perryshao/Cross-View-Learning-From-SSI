@@ -1,5 +1,5 @@
 '''implement the ST-LSTM on NTU RGB+D dataset '''
-## python -m pdb c3d-lstm-ntu-earlyfusion-v2-ta-metric.py
+## python -m pdb ntu-earlyfusion-spp-metric-c3d.py
 import time
 import numpy as np
 import matplotlib.pyplot as plt

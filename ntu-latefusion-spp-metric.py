@@ -1,5 +1,5 @@
 '''implement the MSNN on NTU RGB+D dataset '''
-# python conv-lstm-ntu-fusion-v2-ta-pretrain_spp_metric.py
+# python ntu-latefusion-spp-metric.py
 import time
 import numpy as np
 import keras

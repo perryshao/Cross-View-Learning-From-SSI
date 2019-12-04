@@ -27,8 +27,7 @@ read_skeletons_mat(Dataset_Folder)
 read_skeletons_multiscale(Data_Path)
 ```
  `Dataset_Folder` is the downloaded raw skeleton data (**.skeleton** files).
-
- `Data_Path` is the path of the raw training and testing data (**.mat** files)., which are generated from the raw skeleton data.
+ `Data_Path` is the path of the raw training and testing data (**.mat** files), which are generated from the raw skeleton data.
 
 - Store the training files **.mat** in your own path.
 

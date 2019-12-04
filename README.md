@@ -35,7 +35,7 @@ To do...
 To do...
 
 ## Running the code
-Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training data in **Data preprocessing**. 
+Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training and testing data in **Data preprocessing**. 
 
 - `ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset. 
 - `ntu-earlyfusion-spp-metric.py`: MSNN <sub>early</sub> model (early fusion model)for NTU RGB+D dataset. 

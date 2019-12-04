@@ -20,9 +20,9 @@ pip install -r requirements.txt
 - NTU RGB+D dataset can be found in 
 
 ## Running the code
-- Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the data. 
+> Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the data. 
 
-`ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset.  
+`ntu-latefusion-spp-metric.py` MSNN <sub>late</sub> model (late fusion model) for NTU RGB+D dataset. 
 `ntu-earlyfusion-spp-metric.py`: MSNN <sub>early</sub> model (early fusion model)for NTU RGB+D dataset. 
 `ntu-earlyfusion-spp-metric-c3d.py`: MSNN <sub>early</sub>-C3D model (early fusion model). 
 

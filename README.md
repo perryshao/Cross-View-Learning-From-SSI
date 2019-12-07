@@ -34,10 +34,6 @@ To do...
 ### Northwestern-UCLA Multiview Action Dataset
 To do...
 
-## Models
-
-There are a couple of models as shown in the below table.
-
 
 
 ## Running the code

@@ -310,7 +310,7 @@ def get_model(layers_num,joint_num, max_len, stride_set,class_num, reg,spp_numbe
     model = Model(inputs=[main_input], outputs=[main_output])
     return model
 
-def train_lstms(layers_num,batch_size,joint_num,reg,filepath,stride_set,spp_numbers,spp_numbers_a,epoch,fine_tune = False,scale='1'):
+def train_stream(layers_num,batch_size,joint_num,reg,filepath,stride_set,spp_numbers,spp_numbers_a,epoch,fine_tune = False,scale='1'):
     global_start_time = time.time()
     max_len = 150
     class_num = 60
@@ -389,21 +389,21 @@ if __name__=='__main__':
     spp_numbers1 = [4] # sum([ x**2 for x in spp_numbers1 ])*16 for the spp layer
     spp_numbers1_a = [7]
     layers_num1 = [joint_num1,4,8,16,100,100,sum([ x**2 for x in spp_numbers1 ])*16] ## 16,32,64,100##64,64,64,200 [input_layer,lstm1-lstm3,fc1_layer,fc2_layer] [joint_num1,50,50,50,100]
-    model_scale1,test_score[0]=train_lstms(layers_num1,batch_size,joint_num1,reg,filepath,stride_set,spp_numbers1,spp_numbers1_a,epoch = 40,fine_tune = False,scale='1')
+    model_scale1,test_score[0]=train_stream(layers_num1,batch_size,joint_num1,reg,filepath,stride_set,spp_numbers1,spp_numbers1_a,epoch = 40,fine_tune = False,scale='1')
     model_scale1.save('model_scale1.h5')    
     #########################################################
     joint_num2  = 12*2
     spp_numbers2 = [4]
     spp_numbers2_a = [12]
     layers_num2 = [joint_num2,8,16,32,100,100,sum([ x**2 for x in spp_numbers2 ])*32] ##128, 32,32,100,100##64,64,64,200 [input_layer,lstm1-lstm3,fc1_layer,fc2_layer] [joint_num2,80,80,80,160]
-    model_scale2,test_score[1]=train_lstms(layers_num2,batch_size,joint_num2,reg,filepath,stride_set,spp_numbers2,spp_numbers2_a,epoch=40,fine_tune = False,scale='2')
+    model_scale2,test_score[1]=train_stream(layers_num2,batch_size,joint_num2,reg,filepath,stride_set,spp_numbers2,spp_numbers2_a,epoch=40,fine_tune = False,scale='2')
     model_scale2.save('model_scale2.h5')
     ##########################################################
     joint_num3  = 25*2
     spp_numbers3 = [4]
     spp_numbers3_a = [20]
     layers_num3 = [joint_num3,16,32,64,100,100,sum([ x**2 for x in spp_numbers3 ])*64] ##576, 32,64,64,200 [input_layer,lstm1-lstm3,fc1_layer,fc2_layer] [joint_num2,100,100,100,200]
-    model_scale3,test_score[2]=train_lstms(layers_num3,batch_size,joint_num3,reg,filepath,stride_set,spp_numbers3,spp_numbers3_a, epoch= 40,fine_tune = False,scale='3')
+    model_scale3,test_score[2]=train_stream(layers_num3,batch_size,joint_num3,reg,filepath,stride_set,spp_numbers3,spp_numbers3_a, epoch= 40,fine_tune = False,scale='3')
     model_scale3.save('model_scale3.h5')
     ###########################################################
     model_scale1 = get_model(layers_num1,joint_num1, max_len, stride_set,class_num, reg,spp_numbers1,spp_numbers1_a,scale = '1')

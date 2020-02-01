@@ -48,3 +48,20 @@ Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the
 Notes: In MSNN <sub>early</sub>-C3D model, we use the existing pretrained C3D networks as 3D CNN branches instead of our own designed light-weight CNNs.
 
 
+***
+## Citation
+If you find this code useful, please cite our work with the following bibtex:
+```
+@ARTICLE{shao2019ssi,
+author={Z. {Shao} and Y. {Li} and H. {Zhang}},
+journal={IEEE Transactions on Circuits and Systems for Video Technology},
+title={Learning Representations from Skeletal Self-Similarities for Cross-view Action Recognition},
+year={2020},
+volume={},
+number={},
+pages={1-1},
+keywords={Cross-view action recognition;Human skeleton;Self-similarity;Multi-stream neural network;View-invariant representation},
+doi={10.1109/TCSVT.2020.2965574},
+ISSN={1558-2205},
+month={},}
+```

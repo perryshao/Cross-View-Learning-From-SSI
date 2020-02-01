@@ -52,7 +52,7 @@ Notes: In MSNN <sub>early</sub>-C3D model, we use the existing pretrained C3D ne
 ## Citation
 If you find this code useful, please cite our work with the following bibtex:
 ```
-@ARTICLE{shao2019ssi,
+@ARTICLE{shao2020ssi,
 author={Z. {Shao} and Y. {Li} and H. {Zhang}},
 journal={IEEE Transactions on Circuits and Systems for Video Technology},
 title={Learning Representations from Skeletal Self-Similarities for Cross-view Action Recognition},

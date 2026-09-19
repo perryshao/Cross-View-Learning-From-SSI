@@ -17,7 +17,7 @@ from keras.layers import (BatchNormalization, Conv3D, Dense, Dropout, Input,
 from keras.utils import plot_model
 from keras import regularizers
 from keras import backend as K
-from spp.SpatialPyramidPooling import SpatialPyramidPooling
+from keras_spp.spp.SpatialPyramidPooling import SpatialPyramidPooling
 
 def generate_train(filepath,batch_size,scale):
     while 1:

@@ -17,7 +17,7 @@ from keras.utils import plot_model
 from keras import regularizers
 from keras import backend as K
 import keras.optimizers as op
-from spp.SpatialPyramidPooling import SpatialPyramidPooling
+from keras_spp.spp.SpatialPyramidPooling import SpatialPyramidPooling
 import argparse
      
 def generate_train(filepath,batch_size,scale):

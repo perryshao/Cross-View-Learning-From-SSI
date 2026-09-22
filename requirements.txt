@@ -1,6 +1,16 @@
+# Keras must stay below 2.3: keras_spp/spp/*.py imports
+# `keras.engine.topology`, which was removed in Keras 2.3.0.
+keras<2.3
+
+# TensorFlow backend. The published experiments ran on CUDA 10.1 with
+# Python 2.7; pick the tensorflow-gpu build matching your CUDA toolkit.
+tensorflow-gpu
+
+h5py
 numpy
 scipy
-sklearn
+scikit-learn
 scikit-image
 opencv-python
 matplotlib
+pydot          # required by keras.utils.plot_model

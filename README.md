@@ -29,15 +29,79 @@ pip install -r requirements.txt
   ```
 - Store the training files **.mat** in your own path.
 
-### UESTC RGB-D Varying-view Action Dataset
-To do...
 ### Northwestern-UCLA Multiview Action Dataset
-To do...
+- Download the Northwestern-UCLA Multiview Action 3D dataset.
+- Read the raw skeletons and build the cross-view splits. Edit `filepath` at the top of
+  the script to point at your copy of the dataset; the `--view_N` arguments are resolved
+  relative to it.
+  ```bash
+  python preprocessing/UCLA/read_skeletons_ucla_cv.py \
+      --view_1 multiview_action/view_1 \
+      --view_2 multiview_action/view_2 \
+      --view_3 multiview_action/view_3
+  ```
+- Precompute the SSIs:
+  ```bash
+  python preprocessing/UCLA/compute_ssm_ucla_cv.py
+  ```
+- Matlab helpers for plotting skeletons and SSIs are in `preprocessing/UCLA/Matlab`.
 
+### UWA3D-II Multiview Activity Dataset
+- Download the UWA3D Multiview Activity II dataset.
+- Read the raw skeletons and build the cross-view splits (protocol: views 1,2 vs 3,4):
+  ```bash
+  python preprocessing/UWA/read_skeletons_uwa_cv.py \
+      --view_1 ActionsSkeleton/view_1/ --view_2 ActionsSkeleton/view_2/ \
+      --view_3 ActionsSkeleton/view_3/ --view_4 ActionsSkeleton/view_4/
+  ```
+- Precompute the SSIs:
+  ```bash
+  python preprocessing/UWA/compute_ssm_uwa_cv.py
+  ```
+
+### UESTC RGB-D Varying-view Action Dataset
+- Download the [UESTC RGB-D Varying-view 3D Action](https://github.com/HRI-UESTC/CFM-HRI-RGB-D-action-database)
+  dataset. Its skeleton files are plain text, named
+  `a{action}_d{direction}_p{subject}_c{camera}_skeleton.txt`, covering
+  40 actions, 8 horizontal directions, 2 cameras and 40 subjects, with
+  25 joints per skeleton.
+- Convert the raw text skeletons to **.mat**. Run this from the directory
+  holding the `*_skeleton.txt` files; results are written to `SKL_DATA/`:
+  ```matlab
+  skl_features_extract
+  ```
+  Check the loop ranges at the top of the script before running: they are
+  left at `ACT_NUM = 0:9`, so as shipped it converts only part of the action
+  classes. Widen `ACT_NUM` (and `CAMERA_NUM` / `DIRECTION_NUM` /
+  `PEOPLE_NUM` if you use a subset) to cover the split you need.
+- Build the cross-view splits. There is one script per evaluation protocol;
+  each takes the directory of converted **.mat** files and writes the
+  `*_Raw_cv*.h5` pairs. Edit `filepath` / `datapath` at the top of the script
+  to match your layout.
+  ```bash
+  python preprocessing/UESTC/read_skeletons_uestc_cv1.py -p mat_from_skeleton/
+  python preprocessing/UESTC/read_skeletons_uestc_cv2.py -p mat_from_skeleton/
+  python preprocessing/UESTC/read_skeletons_uestc_cs.py  -p mat_from_skeleton/
+  python preprocessing/UESTC/read_skeletons_uestc_av.py  -p mat_from_skeleton/
+  ```
+
+  | Script | Protocol |
+  |--------|----------|
+  | `read_skeletons_uestc_cv1.py` | CV I -- view 2 vs. the front view |
+  | `read_skeletons_uestc_cv2.py` | CV II -- views 1,3,5,7 vs. FV,2,4,6 |
+  | `read_skeletons_uestc_cs.py`  | CS -- cross-subject |
+  | `read_skeletons_uestc_av.py`  | AV -- arbitrary view |
+
+- UESTC is captured with Kinect v2.0 and so carries the same 25-joint layout
+  as NTU RGB+D; the three SSI scales transfer unchanged.
+- `preprocessing/UESTC/Matlab` also holds `drawskt.m` and
+  `drawskt_uestc_skeleton.m` for plotting UESTC skeletons and the SSIs built
+  from them.
 
 
 ## Running the code
-Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the codes of following files for experiments to your own path of the prepared training and testing data in **Data preprocessing**. 
+Change the `FILEPATH` constant at the top of each of the following files to your own path
+of the prepared training and testing data from **Data preprocessing**.
 
 |              File                  |  Description                                                               |
 |------------------------------------|:--------------------------------------------------------------------------:|
@@ -46,6 +110,30 @@ Change the line `filepath = '/home/data/nturgbd_skeletons/ntu_data_mat/'` in the
 | `ntu-earlyfusion-spp-metric-c3d.py`| MSNN <sub>early</sub>-C3D model (early fusion model) for NTU RGB+D dataset.|
 
 Notes: In MSNN <sub>early</sub>-C3D model, we use the existing pretrained C3D networks as 3D CNN branches instead of our own designed light-weight CNNs.
+This model additionally requires the Sports-1M pretrained weights `sports1M_weights_tf.h5`
+(from [axon-research/c3d-keras](https://github.com/axon-research/c3d-keras), see its
+`models/get_weights_and_mean.sh`) to be present in the working directory.
+
+Other knobs at the top of each script: `GPUS` (passed to `keras.utils.multi_gpu_model`),
+`MAX_LEN`, `CLASS_NUM`, `BATCH_SIZE` and `LAMBDA1` (the &lambda;<sub>1</sub> of Eq. (8),
+set to 1e-6 as in Sec. IV-B).
+
+### Shared modules
+
+|              File     |  Description                                                                  |
+|-----------------------|:------------------------------------------------------------------------------|
+| `MetricLayer.py`      | Learnable Mahalanobis metric layer (Eq. 1-3). `MetricLayer_ForC3D` replicates the SSI into 3 channels for the pretrained C3D branch. |
+| `ssi_layers.py`       | Lambda helpers that build the pairwise joint graph and reshape SSIs.          |
+| `data_utils.py`       | Loading the `.mat` splits, sequence padding, and the `*_Raw_cv*.h5` cache.    |
+| `viz_utils.py`        | `LrReducer` callback, confusion-matrix / training-curve / feature-map plots.  |
+
+### Known differences between the NTU and the other datasets
+
+The NTU scripts integrate the SSI computation into the network as a learnable
+`MetricLayer`, which is the approach described in the paper. The preprocessing for the
+UCLA, UWA and UESTC datasets instead **precomputes** the SSIs with `compute_ssm_*_cv.py`
+and `read_skeletons_*.py`; that route predates the integration and does not involve a
+`MetricLayer`. The two pipelines are not interchangeable.
 
 
 ***

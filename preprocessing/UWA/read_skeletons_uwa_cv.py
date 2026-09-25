@@ -34,8 +34,12 @@ frame_length = []
 
 
 def pad_sequences(sequences, max_len):
+    if len(sequences) == 0:
+        return np.empty((0, max_len, joint_num, 3), dtype='float32')
     y = list()
     for seq in sequences:
+        if seq.shape[0] == 0:
+            raise ValueError('Remove empty sequences and their labels before padding.')
         if seq.shape[0] > max_len:
             seq = np.delete(seq, np.s_[max_len:], axis=0)
         if seq.shape[0] < max_len:
@@ -81,7 +85,7 @@ for view_num in range(4):
         except Exception:
             print('no file %s found!' % seq_mat)
             continue
-        if ske_xyz != []:
+        if np.size(ske_xyz) > 0:
             if (view_num + 1) == 3 or (view_num + 1) == 4:  # protocol (1,2) vs (3,4)
                 ske_xyz = ske_xyz.reshape(-1, ske_xyz.shape[1] // 3, 3)  # (t,joint_num,3)
                 # ske_xyz[:,j,:] = savgol_filter(ske_xyz[:,j,:], 5, 2,axis=0)
@@ -109,14 +113,14 @@ y_label = y_label - 1  # from 0 to 29 for 30 classes.
 # here using LabelBinarizer to help create label indicator matrix from a list of multi-class labels
 # Create a categorical label matrix.
 lb = preprocessing.LabelBinarizer()
-lb.fit(np.unique(y_label))
-y_train = lb.transform(y_label)
+lb.fit(np.arange(30))  # Keep class columns identical across splits.
+y_train = lb.transform(y_label) if y_label.size else np.empty((0, 30), dtype=int)
 print('to build testing categorial labels for 30 classes ')
 y_label = np.reshape(np.array(test_labels), (np.array(test_labels).shape[0], 1))
 y_label = y_label - 1  # from 0 to 29 for 30 classes.
 lb = preprocessing.LabelBinarizer()
-lb.fit(np.unique(y_label))
-y_test = lb.transform(y_label)
+lb.fit(np.arange(30))  # Keep class columns identical across splits.
+y_test = lb.transform(y_label) if y_label.size else np.empty((0, 30), dtype=int)
 
 print('Pad sequences (samples x time)')
 x_train_full = pad_sequences(train_data_cv, max_len)
@@ -130,25 +134,15 @@ scale1_list3 = range(1, 16)
 
 
 # eliminate those data which are zeros
-x_train_has0 = x_train_full
-sample_n = 0
-for sample in range(x_train_has0.shape[0]):
-    if np.count_nonzero(x_train_has0[sample]) == 0:
-        continue
-    x_train_full[sample_n] = x_train_has0[sample]
-    sample_n += 1
-x_train_full = np.delete(x_train_full, np.s_[sample_n:], axis=0)
-y_train = np.delete(y_train, np.s_[sample_n:], axis=0)
+# Apply the same sample mask to coordinates and their labels.
+train_valid = np.any(x_train_full != 0, axis=(1, 2, 3))
+x_train_full = x_train_full[train_valid]
+y_train = y_train[train_valid]
 
-x_test_has0 = x_test_full
-sample_n = 0
-for sample in range(x_test_has0.shape[0]):
-    if np.count_nonzero(x_test_has0[sample]) == 0:
-        continue
-    x_test_full[sample_n] = x_test_has0[sample]
-    sample_n += 1
-x_test_full = np.delete(x_test_full, np.s_[sample_n:], axis=0)
-y_test = np.delete(y_test, np.s_[sample_n:], axis=0)
+# Apply the same sample mask to coordinates and their labels.
+test_valid = np.any(x_test_full != 0, axis=(1, 2, 3))
+x_test_full = x_test_full[test_valid]
+y_test = y_test[test_valid]
 
 # training set
 x_train = np.zeros(

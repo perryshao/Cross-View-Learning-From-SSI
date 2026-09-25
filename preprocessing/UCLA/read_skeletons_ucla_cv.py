@@ -9,8 +9,12 @@ from sklearn import preprocessing
 
 
 def pad_sequences(sequences, max_len):
+    if len(sequences) == 0:
+        return np.empty((0, max_len, joint_num, 3), dtype='float32')
     y = list()
     for seq in sequences:
+        if seq.shape[0] == 0:
+            raise ValueError('Remove empty sequences and their labels before padding.')
         if seq.shape[0] > max_len:
             seq = np.delete(seq, np.s_[max_len:], axis=0)
         if seq.shape[0] < max_len:
@@ -70,11 +74,11 @@ for view_num in range(3):
                     for line in file:
                         if len(line.strip().split(',')) == 1:
                             break
-                        ske_xyz.append(map(float, line.strip().split(',')[:-1]))
+                        ske_xyz.append(list(map(float, line.strip().split(',')[:-1])))
             except Exception:
                 print('no file %s found!' % ske_slide)
                 continue
-        if ske_xyz != []:
+        if np.size(ske_xyz) > 0:
             if (view_num + 1) == 3:  # protocol (1,2)-3
                 test_data_cv.append(np.reshape(np.array(ske_xyz), (-1, joint_num, 3)))
                 test_labels.append(int(seq[1:3]))
@@ -95,14 +99,14 @@ y_label = y_label - 1  # from 0 to 9 for 10 classes.
 # here using LabelBinarizer to help create label indicator matrix from a list of multi-class labels
 # Create a categorical label matrix.
 lb = preprocessing.LabelBinarizer()
-lb.fit(np.unique(y_label))
-y_train = lb.transform(y_label)
+lb.fit(np.arange(10))  # Keep class columns identical across splits.
+y_train = lb.transform(y_label) if y_label.size else np.empty((0, 10), dtype=int)
 print('to build testing categorial labels for 10 classes ')
 y_label = np.reshape(np.array(test_labels), (np.array(test_labels).shape[0], 1))
 y_label = y_label - 1  # from 0 to 9 for 10 classes.
 lb = preprocessing.LabelBinarizer()
-lb.fit(np.unique(y_label))
-y_test = lb.transform(y_label)
+lb.fit(np.arange(10))  # Keep class columns identical across splits.
+y_test = lb.transform(y_label) if y_label.size else np.empty((0, 10), dtype=int)
 
 print('Pad sequences (samples x time)')
 x_train_full = pad_sequences(train_data_cv, max_len)

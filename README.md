@@ -146,10 +146,24 @@ also contain historical `compute_ssm_*_cv.py` scripts for **precomputed** SSIs.
 The `read_skeletons_*.py` scripts write raw skeleton coordinates; they do not compute
 SSIs, and there is no UESTC SSI-generation script in this repository.
 
-The UCLA/UWA raw readers write `(samples, frames, joints, 3)` arrays, while the
-historical SSI generators expect flattened XYZ coordinates. Their data layouts
-must be reconciled before running the two stages together. The precomputed and
-learnable-SSI pipelines are not interchangeable.
+The UCLA/UWA SSI generators accept both `(samples, frames, joints, 3)` reader
+outputs and legacy `(samples, frames, joints * 3)` arrays. They compute fresh
+Euclidean distances for every frame. UCLA uses per-frame min-max normalisation;
+UWA uses per-frame standardisation followed by per-sequence min-max normalisation.
+The precomputed and learnable-SSI pipelines are not interchangeable.
+
+The UCLA, UWA and UESTC readers support Python 3 array handling and keep fixed
+label columns (10, 30 and 40 classes respectively), even when a split is missing
+classes. UWA and UESTC remove all-zero samples using the same mask for coordinates
+and labels. Empty source sequences are skipped; the UESTC arbitrary-view reader
+also skips sequences whose held-out final tenth is empty. Empty splits keep their
+sample, frame, joint and class dimensions. No train/test protocol has been changed.
+
+Regenerate raw caches after these preprocessing fixes, and regenerate offline SSIs
+from the corrected raw files: older caches may contain misaligned labels or
+history-dependent distances. The neural-network implementations and pretrained
+weights are unchanged. Python 3 preprocessing support does not make the historical
+Keras/TensorFlow training environment compatible with current releases.
 
 ***
 ## Citation

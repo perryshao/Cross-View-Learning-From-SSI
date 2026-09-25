@@ -1,71 +1,75 @@
-'''Generate the SSI for UCLA dataset'''
-import numpy as np
+"""Generate frame-local Euclidean SSIs for the UCLA dataset.
+
+Accept both reader outputs (samples, frames, joints, 3) and legacy flattened
+coordinates (samples, frames, joints * 3). Output remains float32 with a final
+singleton image channel. These offline SSIs use Euclidean distances; the
+learned MetricLayer in the NTU models is a separate implementation.
+"""
+
+import os
+
 import h5py
+import numpy as np
 
 
 def load_data(filepath, scale):
-    file1 = h5py.File(filepath + 'Train_Raw_cv' + scale + '.h5', 'r')
-    x_train = file1['x_train'][:]
-    y_train = file1['y_train'][:]
-    file1.close()
-    file2 = h5py.File(filepath + 'Test_Raw_cv' + scale + '.h5', 'r')
-    x_test = file2['x_test'][:]
-    y_test = file2['y_test'][:]
-    file2.close()
+    """Load both raw HDF5 splits, closing each file after reading."""
+    splits = []
+    for part in ('train', 'test'):
+        filename = part.capitalize() + '_Raw_cv' + str(scale) + '.h5'
+        with h5py.File(os.path.join(filepath, filename), 'r') as file:
+            splits.extend([file['x_' + part][:], file['y_' + part][:]])
+    return splits
 
-    return [x_train, y_train, x_test, y_test]
+
+def _joint_sequences(x):
+    """Validate and expose a joint axis without guessing ambiguous layouts."""
+    x = np.asarray(x)
+    if x.ndim == 3 and x.shape[-1] % 3 == 0:
+        x = x.reshape(x.shape[0], x.shape[1], x.shape[2] // 3, 3)
+    if x.ndim != 4 or x.shape[-1] != 3:
+        raise ValueError('Expected (samples, frames, joints, 3) or flattened XYZ coordinates.')
+    if x.shape[1] == 0 or x.shape[2] == 0:
+        raise ValueError('SSI inputs must contain at least one frame and one joint.')
+    if not np.isfinite(x).all():
+        raise ValueError('SSI inputs must contain finite coordinates.')
+    return x
+
+
+def _compute_ssi(x, y):
+    """Compute each frame independently and preserve sample-label alignment."""
+    x = _joint_sequences(x)
+    y = np.asarray(y)
+    if y.ndim == 0 or x.shape[0] != y.shape[0]:
+        raise ValueError('Coordinates and labels must have the same sample count.')
+    images = np.zeros((x.shape[0], x.shape[1], x.shape[2], x.shape[2], 1), dtype='float32')
+    for sample, sequence in enumerate(x):
+        for t, joints in enumerate(sequence):
+            # Allocate fresh distances per frame: no previous frame/sample state.
+            joints = np.asarray(joints, dtype='float64')
+            offsets = joints[:, None, :] - joints[None, :, :]
+            distances = np.sqrt(np.sum(offsets * offsets, axis=-1))
+            # UCLA normalises each frame independently to [0, 1].
+            images[sample, t, :, :, 0] = (distances - distances.min()) / (
+                distances.max() - distances.min() + 1e-8
+            )
+    return images, y
 
 
 def calculate_ssm(filepath, scale):
-    x_train, y_train, _, _ = load_data(filepath, scale)
-    x_train_ssm = np.zeros(
-        [x_train.shape[0], x_train.shape[1], x_train.shape[2] / 3, x_train.shape[2] / 3, 1],
-        dtype="float32",
-    )
-    SSM = np.zeros([x_train.shape[2] / 3, x_train.shape[2] / 3], dtype="float32")
-    for sample in range(x_train.shape[0]):
-        print("Generating %dth ssm at scale %s for trainset" % (sample, scale))
-        for t in range(x_train.shape[1]):
-            for j1 in range(x_train.shape[-1] / 3):
-                current_joint = x_train[sample, t, j1 * 3 : (j1 + 1) * 3]
-                for j2 in range(j1 + 1, x_train.shape[-1] / 3):
-                    rest_joint = x_train[sample, t, j2 * 3 : (j2 + 1) * 3]
-                    SSM[j1, j2] = np.sqrt(np.sum(np.square(current_joint - rest_joint)))
-            SSM += SSM.T  # copy upper tri to lower tri
-            # normalize the images with same scales
-            SSM = (SSM - np.min(SSM)) / (np.max(SSM) - np.min(SSM) + 1e-8)
-            x_train_ssm[sample, t, :, :, 0] = SSM
-    file1 = h5py.File(filepath + 'Trainset' + scale + '.h5', 'w')
-    file1.create_dataset('X_train', data=x_train_ssm)
-    file1.create_dataset('Y_train', data=y_train)
-    file1.close()
-    del x_train_ssm
-    del x_train
-    del y_train
-    del SSM
-
-    _, _, x_test, y_test = load_data(filepath, scale)
-    x_test_ssm = np.zeros(
-        [x_test.shape[0], x_test.shape[1], x_test.shape[2] / 3, x_test.shape[2] / 3, 1],
-        dtype="float32",
-    )
-    SSM = np.zeros([x_test.shape[2] / 3, x_test.shape[2] / 3], dtype="float32")
-    for sample in range(x_test.shape[0]):
-        print("Generating %dth ssm at scale %s for testset" % (sample, scale))
-        for t in range(x_test.shape[1]):
-            for j1 in range(x_test.shape[-1] / 3):
-                current_joint = x_test[sample, t, j1 * 3 : (j1 + 1) * 3]
-                for j2 in range(j1 + 1, x_test.shape[-1] / 3):
-                    rest_joint = x_test[sample, t, j2 * 3 : (j2 + 1) * 3]
-                    SSM[j1, j2] = np.sqrt(np.sum(np.square(current_joint - rest_joint)))
-            SSM += SSM.T  # copy upper tri to lower tri
-            # normalize the images with same scales
-            SSM = (SSM - np.min(SSM)) / (np.max(SSM) - np.min(SSM) + 1e-8)
-            x_test_ssm[sample, t, :, :, 0] = SSM
-    file2 = h5py.File(filepath + 'Testset' + scale + '.h5', 'w')
-    file2.create_dataset('X_test', data=x_test_ssm)
-    file2.create_dataset('Y_test', data=y_test)
-    file2.close()
+    """Convert train/test raw files into the existing SSI HDF5 schema."""
+    # Process one split at a time to avoid holding both dense inputs in memory.
+    for part in ('train', 'test'):
+        raw_name = part.capitalize() + '_Raw_cv' + str(scale) + '.h5'
+        with h5py.File(os.path.join(filepath, raw_name), 'r') as file:
+            x = file['x_' + part][:]
+            y = file['y_' + part][:]
+        images, labels = _compute_ssi(x, y)
+        output_name = part.capitalize() + 'set' + str(scale) + '.h5'
+        with h5py.File(os.path.join(filepath, output_name), 'w') as file:
+            file.create_dataset('X_' + part, data=images)
+            file.create_dataset('Y_' + part, data=labels)
+        del x, y, images, labels
 
 
 if __name__ == '__main__':

@@ -1,8 +1,8 @@
 # Learning Representations from Skeletal Self-Similarities for Cross-View Action Recognition
 ## Introduction
-The algorithm is described in the the paper: [Learning Representation from Skeletal Self-Similarities for Cross-View Action Recognition](https://ieeexplore.ieee.org/document/8955925). In this work, we propose a view-invariant description by formulating self-similarity images (SSIs) of human skeletons, and accordingly introduce a Multi-Stream Neural Network to learn invariant representations from SSIs of varying scales. 
+The algorithm is described in the paper: [Learning Representations from Skeletal Self-Similarities for Cross-View Action Recognition](https://ieeexplore.ieee.org/document/8955925). In this work, we propose a view-invariant description by formulating self-similarity images (SSIs) of human skeletons, and accordingly introduce a Multi-Stream Neural Network to learn invariant representations from SSIs of varying scales.
 
-## SSIs and the approach overview 
+## SSIs and the approach overview
 <p align="center">
   <img height="300" src="docs/teaser1.png">
 </p>
@@ -23,11 +23,14 @@ pip install -r requirements.txt
 - Use the Matlab codes provided in `preprocessing/NTU/Matlab` to read the skeleton data and organize the training data with cross-view and cross-subject protocols. The training data are with **.mat** files. Some of the Matlab codes were made by referring to codes in the repository of the [NTU RGB+D](https://github.com/shahroudy/NTURGB-D) dataset.
 - Running Matlab codes. `Dataset_Folder` is the path of the downloaded raw skeleton data (**.skeleton** files).
  `Data_Path` is the path of the training and testing data (**.mat** files), which are generated from the raw skeleton data.
-  ```bash
-  read_skeletons_mat(Dataset_Folder)  
-  read_skeletons_multiscale(Data_Path)
+  ```matlab
+  read_skeletons_mat(Dataset_Folder)
+  generate_skeletons_multiscale(Data_Path)
   ```
 - Store the training files **.mat** in your own path.
+  Run the first function from `preprocessing/NTU/Matlab` so it can find
+  `samples_with_missing_skeletons.txt`. It saves the splits in the current
+  directory. Set `Data_Path` to that directory, including a trailing separator.
 
 ### Northwestern-UCLA Multiview Action Dataset
 - Download the Northwestern-UCLA Multiview Action 3D dataset.
@@ -87,17 +90,25 @@ pip install -r requirements.txt
 
   | Script | Protocol |
   |--------|----------|
-  | `read_skeletons_uestc_cv1.py` | CV I -- view 2 vs. the front view |
-  | `read_skeletons_uestc_cv2.py` | CV II -- views 1,3,5,7 vs. FV,2,4,6 |
-  | `read_skeletons_uestc_cs.py`  | CS -- cross-subject |
-  | `read_skeletons_uestc_av.py`  | AV -- arbitrary view |
+  | `read_skeletons_uestc_cv1.py` | Experimental CV I subset: train d3/c2; test d5/c2. |
+  | `read_skeletons_uestc_cv2.py` | Experimental CV II subset: train d1,d3,d5,d7/c2; test d6/c2 only. |
+  | `read_skeletons_uestc_cs.py`  | Cross-subject experiment: explicit subject lists; testing restricted to d7/c2. |
+  | `read_skeletons_uestc_av.py`  | Arbitrary-view experiment: train d != 8; test on the final tenth of each d8 sequence. |
+
+  Here `d` and `c` are the direction and camera fields in the filenames.
+  These scripts preserve historical experiment settings, rather than complete
+  implementations of every named benchmark protocol. Inspect the split conditions
+  before using them for an evaluation.
+
+  The MATLAB converter saves a variable named `SKL`, whereas the Python readers
+  expect a variable named `v` with shape `(frames, 75)`. An explicit conversion
+  of the XYZ coordinates and variable name is required between these stages.
 
 - UESTC is captured with Kinect v2.0 and so carries the same 25-joint layout
   as NTU RGB+D; the three SSI scales transfer unchanged.
 - `preprocessing/UESTC/Matlab` also holds `drawskt.m` and
   `drawskt_uestc_skeleton.m` for plotting UESTC skeletons and the SSIs built
   from them.
-
 
 ## Running the code
 Change the `FILEPATH` constant at the top of each of the following files to your own path
@@ -130,11 +141,15 @@ set to 1e-6 as in Sec. IV-B).
 ### Known differences between the NTU and the other datasets
 
 The NTU scripts integrate the SSI computation into the network as a learnable
-`MetricLayer`, which is the approach described in the paper. The preprocessing for the
-UCLA, UWA and UESTC datasets instead **precomputes** the SSIs with `compute_ssm_*_cv.py`
-and `read_skeletons_*.py`; that route predates the integration and does not involve a
-`MetricLayer`. The two pipelines are not interchangeable.
+`MetricLayer`, which is the approach described in the paper. The UCLA and UWA folders
+also contain historical `compute_ssm_*_cv.py` scripts for **precomputed** SSIs.
+The `read_skeletons_*.py` scripts write raw skeleton coordinates; they do not compute
+SSIs, and there is no UESTC SSI-generation script in this repository.
 
+The UCLA/UWA raw readers write `(samples, frames, joints, 3)` arrays, while the
+historical SSI generators expect flattened XYZ coordinates. Their data layouts
+must be reconciled before running the two stages together. The precomputed and
+learnable-SSI pipelines are not interchangeable.
 
 ***
 ## Citation

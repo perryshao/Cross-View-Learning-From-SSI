@@ -24,7 +24,6 @@ class RoiPoolingConv(Layer):
     """
 
     def __init__(self, pool_size, num_rois, **kwargs):
-
         self.dim_ordering = K.image_dim_ordering()
         assert self.dim_ordering in {'tf', 'th'}, 'dim_ordering must be in {tf, th}'
 
@@ -46,8 +45,7 @@ class RoiPoolingConv(Layer):
             return None, self.num_rois, self.pool_size, self.pool_size, self.nb_channels
 
     def call(self, x, mask=None):
-
-        assert (len(x) == 2)
+        assert len(x) == 2
 
         img = x[0]
         rois = x[1]
@@ -57,7 +55,6 @@ class RoiPoolingConv(Layer):
         outputs = []
 
         for roi_idx in range(self.num_rois):
-
             x = rois[0, roi_idx, 0]
             y = rois[0, roi_idx, 1]
             w = rois[0, roi_idx, 2]
@@ -87,8 +84,7 @@ class RoiPoolingConv(Layer):
                         dy = K.maximum(1, y2 - y1)
                         y2 = y1 + dy
 
-                        new_shape = [input_shape[0], input_shape[1],
-                                     y2 - y1, x2 - x1]
+                        new_shape = [input_shape[0], input_shape[1], y2 - y1, x2 - x1]
 
                         x_crop = img[:, :, y1:y2, x1:x2]
                         xm = K.reshape(x_crop, new_shape)
@@ -108,15 +104,16 @@ class RoiPoolingConv(Layer):
                         y1 = K.cast(y1, 'int32')
                         y2 = K.cast(y2, 'int32')
 
-                        new_shape = [input_shape[0], y2 - y1,
-                                     x2 - x1, input_shape[3]]
+                        new_shape = [input_shape[0], y2 - y1, x2 - x1, input_shape[3]]
                         x_crop = img[:, y1:y2, x1:x2, :]
                         xm = K.reshape(x_crop, new_shape)
                         pooled_val = K.max(xm, axis=(1, 2))
                         outputs.append(pooled_val)
 
         final_output = K.concatenate(outputs, axis=0)
-        final_output = K.reshape(final_output, (1, self.num_rois, self.pool_size, self.pool_size, self.nb_channels))
+        final_output = K.reshape(
+            final_output, (1, self.num_rois, self.pool_size, self.pool_size, self.nb_channels)
+        )
 
         if self.dim_ordering == 'th':
             final_output = K.permute_dimensions(final_output, (0, 1, 4, 2, 3))

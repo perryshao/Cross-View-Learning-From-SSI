@@ -8,9 +8,9 @@ class RoiPooling(Layer):
     K. He, X. Zhang, S. Ren, J. Sun
     # Arguments
         pool_list: list of int
-            List of pooling regions to use. The length of the list is the number of pooling regions,
-            each int in the list is the number of regions in that pool. For example [1,2,4] would be 3
-            regions with 1, 2x2 and 4x4 max pools, so 21 outputs per feature map
+            Pooling-grid sizes, one per pyramid level. For example,
+            [1, 2, 4] specifies levels with 1, 2x2 and 4x4 max pools,
+            giving 21 outputs per feature map.
         num_rois: number of regions of interest to be used
     # Input shape
         list of two 4D tensors [X_img,X_roi] with shape:
@@ -26,7 +26,6 @@ class RoiPooling(Layer):
     """
 
     def __init__(self, pool_list, num_rois, **kwargs):
-
         self.dim_ordering = K.image_dim_ordering()
         assert self.dim_ordering in {'tf', 'th'}, 'dim_ordering must be in {tf, th}'
 
@@ -52,8 +51,7 @@ class RoiPooling(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
     def call(self, x, mask=None):
-
-        assert (len(x) == 2)
+        assert len(x) == 2
 
         img = x[0]
         rois = x[1]
@@ -63,7 +61,6 @@ class RoiPooling(Layer):
         outputs = []
 
         for roi_idx in range(self.num_rois):
-
             x = rois[0, roi_idx, 0]
             y = rois[0, roi_idx, 1]
             w = rois[0, roi_idx, 2]
@@ -86,8 +83,7 @@ class RoiPooling(Layer):
                             y1 = K.cast(K.round(y1), 'int32')
                             y2 = K.cast(K.round(y2), 'int32')
 
-                            new_shape = [input_shape[0], input_shape[1],
-                                         y2 - y1, x2 - x1]
+                            new_shape = [input_shape[0], input_shape[1], y2 - y1, x2 - x1]
                             x_crop = img[:, :, y1:y2, x1:x2]
                             xm = K.reshape(x_crop, new_shape)
                             pooled_val = K.max(xm, axis=(2, 3))
@@ -107,14 +103,15 @@ class RoiPooling(Layer):
                             y1 = K.cast(K.round(y1), 'int32')
                             y2 = K.cast(K.round(y2), 'int32')
 
-                            new_shape = [input_shape[0], y2 - y1,
-                                         x2 - x1, input_shape[3]]
+                            new_shape = [input_shape[0], y2 - y1, x2 - x1, input_shape[3]]
                             x_crop = img[:, y1:y2, x1:x2, :]
                             xm = K.reshape(x_crop, new_shape)
                             pooled_val = K.max(xm, axis=(1, 2))
                             outputs.append(pooled_val)
 
         final_output = K.concatenate(outputs, axis=0)
-        final_output = K.reshape(final_output, (1, self.num_rois, self.nb_channels * self.num_outputs_per_channel))
+        final_output = K.reshape(
+            final_output, (1, self.num_rois, self.nb_channels * self.num_outputs_per_channel)
+        )
 
         return final_output

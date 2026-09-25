@@ -10,7 +10,7 @@ twice and subtracting:
     (batch, T, N, 3)  --repeat_x_groupjoint--> (batch, T, N*N, 3)   [p_j tiled]
     subtract                                -> (batch, T, N*N, 3)   [p_i - p_j]
 
-`MetricLayer` then maps that to the SSI, and `flatten_ssm` reshapes the flat
+`MetricLayer` then maps that to the SSI, and `flattenSSM` reshapes the flat
 N*N axis back into an N x N image so the 3D CNN branch can consume it.
 """
 
@@ -18,9 +18,8 @@ import numpy as np
 from keras import backend as K
 
 
-## ---------------------------------------------------------------------------
-## pairwise joint graph building (Eq. 1)
-## ---------------------------------------------------------------------------
+# pairwise joint graph building (Eq. 1)
+
 
 def repeat_x_onejoint(x):
     shape = x.shape.as_list()
@@ -49,9 +48,8 @@ def repeat_x_groupjoint_output_shape(input_shape):
     return tuple(shape)
 
 
-## ---------------------------------------------------------------------------
-## reshaping between the flat (N*N) SSI axis and the N x N image
-## ---------------------------------------------------------------------------
+# reshaping between the flat (N*N) SSI axis and the N x N image
+
 
 def make_flatten_ssm(channels=1):
     """Return the `(fn, output_shape_fn)` pair for a Lambda that reshapes
@@ -63,30 +61,33 @@ def make_flatten_ssm(channels=1):
 
     def flatten_ssm(x):
         shape = x.shape.as_list()
-        return K.reshape(x, [-1, shape[1],
-                             int(np.sqrt(shape[2])), int(np.sqrt(shape[2])),
-                             channels])
+        return K.reshape(
+            x, [-1, shape[1], int(np.sqrt(shape[2])), int(np.sqrt(shape[2])), channels]
+        )
 
     def flatten_ssm_output_shape(input_shape):
         shape = list(input_shape)
         assert len(shape) == 4  # only valid for 4D tensors
-        return (input_shape[0], input_shape[1],
-                int(np.sqrt(input_shape[2])), int(np.sqrt(input_shape[2])),
-                channels)
+        return (
+            input_shape[0],
+            input_shape[1],
+            int(np.sqrt(input_shape[2])),
+            int(np.sqrt(input_shape[2])),
+            channels,
+        )
 
     return flatten_ssm, flatten_ssm_output_shape
 
 
-#: single-channel SSI -- used by the two light-weight-CNN models
+# : single-channel SSI -- used by the two light-weight-CNN models
 flattenSSM, flattenSSM_output_shape = make_flatten_ssm(channels=1)
 
-#: 3-channel SSI -- used by the pretrained C3D model
+# : 3-channel SSI -- used by the pretrained C3D model
 flattenSSM3, flattenSSM3_output_shape = make_flatten_ssm(channels=3)
 
 
-## ---------------------------------------------------------------------------
-## flattening convolutional feature maps for the LSTM / fusion stages
-## ---------------------------------------------------------------------------
+# flattening convolutional feature maps for the LSTM / fusion stages
+
 
 def flattenConv(x):
     shape = K.shape(x)

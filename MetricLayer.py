@@ -41,7 +41,7 @@ class MetricLayer(Layer):
         4D tensor `(batch, T, N*N, 1)`.
     """
 
-    #: number of channels replicated on the output (see MetricLayer_ForC3D)
+    # : number of channels replicated on the output (see MetricLayer_ForC3D)
     channels = 1
 
     def __init__(self, output_dim, kernel_regularizer=None, **kwargs):
@@ -51,11 +51,13 @@ class MetricLayer(Layer):
 
     def build(self, input_shape):
         # L in Eq. (3): a (3, 3) linear transform on the xyz joint offsets.
-        self.kernel = self.add_weight(name='kernel',
-                                      shape=(input_shape[-1], input_shape[-1]),
-                                      initializer='uniform',
-                                      regularizer=self.kernel_regularizer,
-                                      trainable=True)
+        self.kernel = self.add_weight(
+            name='kernel',
+            shape=(input_shape[-1], input_shape[-1]),
+            initializer='uniform',
+            regularizer=self.kernel_regularizer,
+            trainable=True,
+        )
         super(MetricLayer, self).build(input_shape)
 
     def call(self, inputs):

@@ -14,8 +14,10 @@ def _plt():
     plotting involved -- does not drag in matplotlib and its image stack.
     """
     import matplotlib
+
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
+
     return plt
 
 
@@ -31,7 +33,7 @@ class LrReducer(keras.callbacks.Callback):
         super(LrReducer, self).__init__()
         self.patience = patience
         self.wait = 0
-        self.best_loss = 100.
+        self.best_loss = 100.0
         self.reduce_rate = reduce_rate
         self.current_reduce_nb = 0
         self.reduce_nb = reduce_nb
@@ -61,10 +63,7 @@ class LrReducer(keras.callbacks.Callback):
             self.wait += 1
 
 
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=None):
+def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=None):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -88,11 +87,15 @@ def plot_confusion_matrix(cm, classes,
     plt.yticks(tick_marks, classes)
 
     fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
+    thresh = cm.max() / 2.0
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+        plt.text(
+            j,
+            i,
+            format(cm[i, j], fmt),
+            horizontalalignment="center",
+            color="white" if cm[i, j] > thresh else "black",
+        )
 
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
@@ -107,8 +110,8 @@ def visualize_layer(model, layer_name, data, time_step):
     plt = _plt()
     import colormaps as cmaps
 
-    ## NB: this used to read a module-level `model_scale3` instead of the
-    ## `model` argument, so it only ever worked for that one global.
+    # NB: this used to read a module-level `model_scale3` instead of the
+    # `model` argument, so it only ever worked for that one global.
     layer_map = K.function([model.layers[0].input], [model.get_layer(layer_name).output])
     layer_output = layer_map([data])[0]
     f1 = layer_output[0, time_step, :, :, :]
@@ -143,6 +146,7 @@ def plot_training_history(history, filename):
 
     class _Merged(object):
         history = {k: series(k) for k in ('acc', 'loss')}
+
     merged = _Merged()
     if has_val:
         merged.history['val_acc'] = series('val_acc')
